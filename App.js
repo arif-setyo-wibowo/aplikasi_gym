@@ -83,7 +83,12 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
           title: 'Account Settings',
           headerLeft: () => null
         }}
+        listeners={{
+          tabPress: () => setActiveTab('AccountSettings'),
+          focus: () => setShowBottomBar(true), 
+        }}
       />
+      
       <Stack.Screen 
         name="username" 
         component={UsernameScreen} 
