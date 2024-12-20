@@ -3,8 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, A
 
 const LatihanTambah = () => {
   const [exercises, setExercises] = useState([
-    { id: '1', name: 'Bench Press (Dumbbell)', image: 'https://via.placeholder.com/50', restTimer: 'OFF', sets: [{ id: 1, kg: '', reps: '' }] },
-    { id: '2', name: 'Bicep Curl (Dumbbell)', image: 'https://via.placeholder.com/50', restTimer: 'OFF', sets: [{ id: 1, kg: '', reps: '' }] },
+    { id: '1', name: 'Bench Press (Dumbbell)', image: 'https://via.placeholder.com/50', sets: [{ id: 1, kg: '', reps: '' }] },
+    { id: '2', name: 'Bicep Curl (Dumbbell)', image: 'https://via.placeholder.com/50', sets: [{ id: 1, kg: '', reps: '' }] },
   ]);
 
   const addSet = (exerciseId) => {
@@ -42,7 +42,6 @@ const LatihanTambah = () => {
       id: Date.now().toString(),
       name: 'New Exercise',
       image: 'https://via.placeholder.com/50',
-      restTimer: 'OFF',
       sets: [{ id: 1, kg: '', reps: '' }],
     };
     setExercises((prevExercises) => [...prevExercises, newExercise]);
@@ -65,7 +64,6 @@ const LatihanTambah = () => {
           <Text style={styles.deleteText}>Hapus</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.restTimer}>Rest Timer: {item.restTimer}</Text>
       <View style={styles.setRow}>
         <Text style={styles.setColumn}>SET</Text>
         <Text style={styles.setColumn}>KG</Text>
@@ -160,11 +158,6 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 14,
     fontWeight: 'bold',
-  },
-  restTimer: {
-    color: '#4DA6FF',
-    fontSize: 14,
-    marginBottom: 8,
   },
   setRow: {
     flexDirection: 'row',
