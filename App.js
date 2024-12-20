@@ -5,10 +5,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/Settings';
-import ExploreScreen from './src/screens/Explore';
+import AccountSettings from './src/screens/AccountSettings';
 import DetailScreen from './src/screens/Detail';
 import LatihanScreen from './src/screens/Latihan';
 import LatihanTambahScreen from './src/screens/LatihanTambah';
+import UsernameScreen from './src/screens/Username';
+import testScreen from './src/screens/EmailScreen';
+import PasswordScreen from './src/screens/Password';
 import DetailSScreen from './src/screens/DetailSettings';
 import { useNavigation } from '@react-navigation/native'; 
 
@@ -74,24 +77,49 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
       />
 
       <Stack.Screen 
-        name="Explore" 
-        component={ExploreScreen} 
+        name="AccountSettings" 
+        component={AccountSettings} 
         options={{ 
-          title: 'Explore',
-          headerLeft: () => null,
-          headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 15 }} 
-              onPress={() => alert('Tombol pencarian ditekan!')} 
-            >
-              <Ionicons name="search" size={24} color="#fffff" />
-            </TouchableOpacity>
-          ), 
+          title: 'Account Settings',
+          headerLeft: () => null
+        }}
+      />
+      <Stack.Screen 
+        name="username" 
+        component={UsernameScreen} 
+        options={{ 
+          title: 'Ubah Username'
         }}
         listeners={{
-          tabPress: () => setActiveTab('Explore'),
-        }} 
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true), 
+        }}
       />
+      
+      <Stack.Screen 
+        name="password" 
+        component={PasswordScreen} 
+        options={{ 
+          title: 'Ubah Password'
+        }}
+        listeners={{
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true), 
+        }}
+      />
+
+      <Stack.Screen 
+        name="email" 
+        component={testScreen} 
+        options={{ 
+          title: 'Ubah Password'
+        }}
+        listeners={{
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true), 
+        }}
+      />
+
       <Stack.Screen 
         name="Settings" 
         component={SettingsScreen} 
@@ -122,14 +150,14 @@ const BottomBar = ({ activeTab, setActiveTab }) => {
         <Text style={{ color: activeTab === 'HomeScreen' ? '#ffffff' : 'gray' }}>Workout</Text>
       </TouchableOpacity>
       <TouchableOpacity 
-        style={[styles.tab, activeTab === 'Explore' && styles.activeTab]} 
+        style={[styles.tab, activeTab === 'AccountSettings' && styles.activeTab]} 
         onPress={() => {
-          setActiveTab('Explore');
-          navigation.navigate('Explore');
+          setActiveTab('AccountSettings');
+          navigation.navigate('AccountSettings');
         }}
       >
-        <Ionicons name="person-circle-outline" size={24} color={activeTab === 'Explore' ? '#ffffff' : 'gray'} />
-        <Text style={{ color: activeTab === 'Explore' ? '#ffffff' : 'gray' }}>Profile</Text>
+        <Ionicons name="person-circle-outline" size={24} color={activeTab === 'AccountSettings' ? '#ffffff' : 'gray'} />
+        <Text style={{ color: activeTab === 'AccountSettings' ? '#ffffff' : 'gray' }}>Profile</Text>
       </TouchableOpacity>
     </View>
   );
@@ -158,8 +186,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 60,
     backgroundColor: '#1e1e1e',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
   },
   tab: {
     backgroundColor: '#1e1e1e',

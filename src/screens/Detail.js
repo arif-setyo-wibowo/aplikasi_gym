@@ -24,7 +24,7 @@ export default function DetailScreen() {
       </View>
 
       {/* Add Exercise Button */}
-      <TouchableOpacity style={styles.addButton}  onPress={() => navigation.navigate('Latihan')}>
+      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('Latihan')}>
         <Text style={styles.addButtonText}>+ Add exercise</Text>
       </TouchableOpacity>
     </View>
