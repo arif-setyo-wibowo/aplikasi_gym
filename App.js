@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './src/screens/HomeScreen';
-import SettingsScreen from './src/screens/Settings';
+import DetailLatihanScreen from './src/screens/DetailLatihan';
 import AccountSettings from './src/screens/AccountSettings';
 import DetailScreen from './src/screens/Detail';
 import LatihanScreen from './src/screens/Latihan';
@@ -30,7 +30,7 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
         options={{ title: 'Workout', headerLeft: () => null }}
         listeners={{
           tabPress: () => setActiveTab('HomeScreen'),
-          focus: () => setShowBottomBar(true), 
+          focus: () => setShowBottomBar(true)
         }}
       />
       <Stack.Screen 
@@ -63,7 +63,7 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
         }}
         listeners={{
           focus: () => setShowBottomBar(false), 
-          blur: () => setShowBottomBar(true), 
+          blur: () => setShowBottomBar(true)
         }}
       />
       <Stack.Screen 
@@ -72,7 +72,7 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
         options={{ title: 'Setelan Umum'}}
         listeners={{
           focus: () => setShowBottomBar(false), 
-          blur: () => setShowBottomBar(true), 
+          blur: () => setShowBottomBar(true)
         }}
       />
 
@@ -85,10 +85,10 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
         }}
         listeners={{
           tabPress: () => setActiveTab('AccountSettings'),
-          focus: () => setShowBottomBar(true), 
+          focus: () => setShowBottomBar(true)
         }}
       />
-      
+
       <Stack.Screen 
         name="username" 
         component={UsernameScreen} 
@@ -97,7 +97,7 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
         }}
         listeners={{
           focus: () => setShowBottomBar(false), 
-          blur: () => setShowBottomBar(true), 
+          blur: () => setShowBottomBar(true) 
         }}
       />
       
@@ -109,7 +109,7 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
         }}
         listeners={{
           focus: () => setShowBottomBar(false), 
-          blur: () => setShowBottomBar(true), 
+          blur: () => setShowBottomBar(true) 
         }}
       />
 
@@ -121,16 +121,17 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
         }}
         listeners={{
           focus: () => setShowBottomBar(false), 
-          blur: () => setShowBottomBar(true), 
+          blur: () => setShowBottomBar(true)
         }}
       />
 
       <Stack.Screen 
-        name="Settings" 
-        component={SettingsScreen} 
-        options={{ title: 'Settings', headerLeft: () => null }} 
+        name="detailLatihan"
+        component={DetailLatihanScreen}
+        options={{ title: 'Detail latihan' }} 
         listeners={{
-          tabPress: () => setActiveTab('Settings'),
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true)
         }} 
       />
     </Stack.Navigator>

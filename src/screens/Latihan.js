@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Tambahkan library ikon
 import { useNavigation } from '@react-navigation/native';
- 
+
 const LatihanScreen = () => {
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
   const [selectedExercises, setSelectedExercises] = useState([]);
 
   const allExercises = [
@@ -25,12 +26,12 @@ const LatihanScreen = () => {
 
   const renderExerciseItem = ({ item }) => {
     const isSelected = selectedExercises.some((e) => e.id === item.id);
-
+  
     return (
       <TouchableOpacity onPress={() => handleExerciseClick(item)} style={styles.exerciseItem}>
         {/* Gambar */}
         <Image source={{ uri: item.image }} style={styles.exerciseImage} />
-
+  
         {/* Teks */}
         <View style={styles.exerciseTextContainer}>
           <Text style={styles.exerciseName}>{item.name}</Text>
@@ -39,13 +40,29 @@ const LatihanScreen = () => {
           </Text>
         </View>
 
-        {/* Ikon untuk Tambahkan */}
-        <Text style={[styles.addIcon, isSelected && styles.addIconSelected]}>
-          {isSelected ? '✓' : '↻'}
-        </Text>
+        {/* Ikon Pilih */}
+        <Icon
+          name={isSelected ? 'checkmark-circle' : 'refresh'}
+          size={24}
+          color={isSelected ? '#0F0' : '#4DA6FF'}
+          style={styles.iconStyle}
+        />
+
+        {/* Ikon Detail */}
+        <TouchableOpacity onPress={() => navigation.navigate('detailLatihan', { exercise: item })}>
+          <Icon
+            name="information-circle-outline"
+            size={24}
+            color="#4DA6FF"
+            style={styles.detailIcon}
+          />
+        </TouchableOpacity>
+  
+        
       </TouchableOpacity>
     );
   };
+  
 
   return (
     <View style={styles.container}>
@@ -55,17 +72,17 @@ const LatihanScreen = () => {
         placeholder="Search exercise"
         placeholderTextColor="#888"
       />
-      <View style={styles.filterContainer}>
+      {/* <View style={styles.filterContainer}>
         <TouchableOpacity style={styles.filterButton}>
           <Text style={styles.filterText}>All Equipment</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.filterButton}>
           <Text style={styles.filterText}>All Muscles</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {/* All Exercises */}
-      <Text style={styles.sectionTitle}>All Exercises</Text>
+      {/* <Text style={styles.sectionTitle}>All Exercises</Text> */}
       <FlatList
         data={allExercises}
         keyExtractor={(item) => item.id}
@@ -143,13 +160,8 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 14,
   },
-  addIcon: {
-    color: '#4DA6FF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  addIconSelected: {
-    color: '#0F0',
+  iconStyle: {
+    marginRight: 8,
   },
   addButton: {
     backgroundColor: '#4DA6FF',
