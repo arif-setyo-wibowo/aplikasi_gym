@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -13,17 +13,21 @@ import UsernameScreen from './src/screens/Username';
 import testScreen from './src/screens/EmailScreen';
 import PasswordScreen from './src/screens/Password';
 import DetailSScreen from './src/screens/DetailSettings';
+import LoginScreen from './src/screens/LoginScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
 import { useNavigation } from '@react-navigation/native'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Stack = createStackNavigator();
 
-function MyStack({ setActiveTab, setShowBottomBar }) {
+function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
   return (
-    <Stack.Navigator initialRouteName="HomeScreen"
-      screenOptions={{
-        headerStyle: { backgroundColor: '#000' },
-        headerTintColor: '#fff',
-      }}>
+    <Stack.Navigator initialRouteName={isLoggedIn ? "HomeScreen" : "LoginScreen"}
+    screenOptions={{
+      headerStyle: { backgroundColor: '#000' },
+      headerTintColor: '#fff',
+    }}>
       <Stack.Screen 
         name="HomeScreen" 
         component={HomeScreen} 
@@ -134,6 +138,27 @@ function MyStack({ setActiveTab, setShowBottomBar }) {
           blur: () => setShowBottomBar(true)
         }} 
       />
+
+      <Stack.Screen 
+        name="LoginScreen" 
+        component={LoginScreen} 
+        options={{ title: 'Login', headerShown: false ,}} 
+        listeners={{
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true), 
+        }}
+      />
+
+      <Stack.Screen 
+        name="RegisterScreen" 
+        component={RegisterScreen} 
+        options={{ title: 'Register', headerShown: false }} 
+        listeners={{
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true), 
+        }}
+      />
+
     </Stack.Navigator>
   );
 }
@@ -172,7 +197,53 @@ const BottomBar = ({ activeTab, setActiveTab }) => {
 export default function App() {
   const [activeTab, setActiveTab] = useState('HomeScreen');
   const [showBottomBar, setShowBottomBar] = useState(true); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  
+
+  useEffect(() => {
+    // Fungsi untuk memeriksa status login dan token
+    const checkLoginStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token'); // Mengambil token dari AsyncStorage
+        if (token) {
+          const response = await fetch('http://192.168.1.2:8080/check_session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: token }),
+          });
+
+          const data = await response.json();
+          if (response.ok && data.status === 'valid') {
+            setIsLoggedIn(true); // Jika token valid, set login status
+          } else {
+            setIsLoggedIn(false); // Jika tidak valid, set login status ke false
+          }
+        } else {
+          setIsLoggedIn(false); // Jika token tidak ada
+        }
+      } catch (error) {
+        console.error('Error checking session:', error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  const handleLogin = async () => {
+    // Simulasi login berhasil dan menyimpan token
+    const token = 'your_token_here'; // Gantilah dengan token yang didapatkan setelah login
+    await AsyncStorage.setItem('token', token);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    setIsLoggedIn(false);
+  };
   return (
     <NavigationContainer>
       <MyStack 
@@ -183,6 +254,8 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+
 
 
 const styles = StyleSheet.create({
