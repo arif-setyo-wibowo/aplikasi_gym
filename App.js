@@ -229,8 +229,8 @@ export default function App() {
             },
             body: JSON.stringify({ token: token }),
           });
-
           const data = await response.json();
+          
           if (response.ok && data.status === 'valid') {
             setIsLoggedIn(true); // Jika token valid, set login status
           } else {
@@ -244,7 +244,7 @@ export default function App() {
         setIsLoggedIn(false);
       }
     };
-
+    
     checkLoginStatus();
   }, []);
 

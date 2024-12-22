@@ -35,10 +35,14 @@ export default function LoginScreen() {
       if (response.ok) {
         // Mengambil id dari respon
         const userId = data.data.id;
+        const username = data.data.username;
+        const email = data.data.email;
   
         // Menyimpan id ke AsyncStorage
         await AsyncStorage.setItem('id', userId.toString());
-       // console.log('Stored ID:', userId);
+        await AsyncStorage.setItem('username', username.toString());
+        await AsyncStorage.setItem('email', email.toString());
+        console.log('Stored ID:', username,email);
        
         // Jika login berhasil
         Alert.alert('Berhasil', 'Login berhasil!');

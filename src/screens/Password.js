@@ -1,18 +1,44 @@
-import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 
 export default function Password() {
-  const [password, setPassword] = useState('test123');
+  const [password, setPassword] = useState('test123sdasd');
 
-  const handleUpdate = () => {
-    alert(`Password berhasil diupdate ke: ${password}`);
+  const handleUpdate = async () => {
+    try {
+      const ip = await AsyncStorage.getItem('ip'); // Ambil IP dari AsyncStorage
+      const userid = await AsyncStorage.getItem('id'); // Ambil User ID dari AsyncStorage
+
+      const response = await fetch(`http://${ip}:8080/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'id': userid,
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Simpan username yang diperbarui ke AsyncStorage
+        Alert.alert('Success', 'Pasword berhasil diperbarui.');
+      } else {
+        Alert.alert('Error', data.message || 'Gagal memperbarui Pasword.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Terjadi kesalahan saat memperbarui Pasword.');
+    }
   };
+
 
   return (
     <View style={styles.container}>
@@ -23,6 +49,7 @@ export default function Password() {
           style={styles.input}
           value={password}
           onChangeText={setPassword}
+          secureTextEntry
         />
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
           <Text style={styles.buttonText}>Update</Text>

@@ -1,18 +1,72 @@
-import React, { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 
 export default function Username() {
-  const [username, setUsername] = useState('jupri'); // Default value
+  const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const handleUpdate = () => {
-    alert(`Username berhasil diupdate ke: ${username}`);
+  // Ambil username dari AsyncStorage saat aplikasi dimulai
+  useEffect(() => {
+    const fetchUsernameFromStorage = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('username'); // Ambil username dari AsyncStorage
+        if (storedUsername) {
+          setUsername(storedUsername);
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Gagal mengambil username dari penyimpanan.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsernameFromStorage();
+  }, []);
+
+  // Fungsi untuk mengupdate username
+  const handleUpdate = async () => {
+    try {
+      const ip = await AsyncStorage.getItem('ip'); // Ambil IP dari AsyncStorage
+      const userid = await AsyncStorage.getItem('id'); // Ambil User ID dari AsyncStorage
+
+      const response = await fetch(`http://${ip}:8080/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'id': userid,
+        },
+        body: JSON.stringify({ username }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Simpan username yang diperbarui ke AsyncStorage
+        await AsyncStorage.setItem('username', username);
+        Alert.alert('Success', 'Username berhasil diperbarui.');
+      } else {
+        Alert.alert('Error', data.message || 'Gagal memperbarui username.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Terjadi kesalahan saat memperbarui username.');
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loadingText}>Memuat username...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -28,7 +82,6 @@ export default function Username() {
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
       </View>
-
     </View>
   );
 }
@@ -66,12 +119,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  navItem: {
-    alignItems: 'center',
-  },
-  navText: {
+  loadingText: {
     color: 'white',
-    fontSize: 12,
-    marginTop: 5,
+    fontSize: 16,
   },
 });
