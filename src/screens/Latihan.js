@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Tambahkan library ikon
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
 const LatihanScreen = () => {
   const navigation = useNavigation();
   const [selectedExercises, setSelectedExercises] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const allExercises = [
     { id: '3', name: '21s Bicep Curl', muscle: 'Biceps', image: 'https://via.placeholder.com/50' },
     { id: '4', name: 'Ab Scissors', muscle: 'Abdominals', image: 'https://via.placeholder.com/50' },
     { id: '5', name: 'Ab Wheel', muscle: 'Abdominals', image: 'https://via.placeholder.com/50' },
-    { id: '6', name: '21s Bicep Curl', muscle: 'Biceps', image: 'https://via.placeholder.com/50' },
-    { id: '7', name: 'Ab Scissors', muscle: 'Abdominals', image: 'https://via.placeholder.com/50' },
-    { id: '8', name: 'Ab Wheel', muscle: 'Abdominals', image: 'https://via.placeholder.com/50' },
+    { id: '6', name: 'Dumbbell Bench Press', muscle: 'Chest', image: 'https://via.placeholder.com/50' },
+    { id: '7', name: 'Plank', muscle: 'Core', image: 'https://via.placeholder.com/50' },
+    { id: '8', name: 'Deadlift', muscle: 'Back', image: 'https://via.placeholder.com/50' },
   ];
 
   const handleExerciseClick = (exercise) => {
@@ -24,74 +25,66 @@ const LatihanScreen = () => {
     }
   };
 
+  const filteredExercises = allExercises.filter((exercise) =>
+    exercise.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const renderExerciseItem = ({ item }) => {
     const isSelected = selectedExercises.some((e) => e.id === item.id);
-  
+
     return (
-      <TouchableOpacity onPress={() => handleExerciseClick(item)} style={styles.exerciseItem}>
+      <TouchableOpacity
+        onPress={() => handleExerciseClick(item)}
+        style={[
+          styles.exerciseItem,
+          isSelected && styles.selectedExerciseItem, 
+        ]}
+      >
         {/* Gambar */}
         <Image source={{ uri: item.image }} style={styles.exerciseImage} />
-  
+
         {/* Teks */}
         <View style={styles.exerciseTextContainer}>
           <Text style={styles.exerciseName}>{item.name}</Text>
-          <Text style={styles.exerciseMuscle}>
-            {item.muscle} {item.type ? `(${item.type})` : ''}
-          </Text>
+          <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
         </View>
 
-        {/* Ikon Pilih */}
-        <Icon
-          name={isSelected ? 'checkmark-circle' : 'refresh'}
-          size={24}
-          color={isSelected ? '#0F0' : '#4DA6FF'}
-          style={styles.iconStyle}
-        />
 
         {/* Ikon Detail */}
-        <TouchableOpacity onPress={() => navigation.navigate('detailLatihan', { exercise: item })}>
-          <Icon
-            name="information-circle-outline"
-            size={24}
-            color="#4DA6FF"
-            style={styles.detailIcon}
-          />
+        <TouchableOpacity
+          onPress={() => navigation.navigate('detailLatihan', { exercise: item })}
+          style={styles.detailButton}
+        >
+          <Icon name="information-circle-outline" size={24} color="#4DA6FF" />
         </TouchableOpacity>
-  
-        
       </TouchableOpacity>
     );
   };
-  
 
   return (
     <View style={styles.container}>
-      {/* Search and Filters */}
+      {/* Search Bar */}
       <TextInput
         style={styles.searchInput}
         placeholder="Search exercise"
         placeholderTextColor="#888"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
       />
-      {/* <View style={styles.filterContainer}>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>All Equipment</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>All Muscles</Text>
-        </TouchableOpacity>
-      </View> */}
 
-      {/* All Exercises */}
-      {/* <Text style={styles.sectionTitle}>All Exercises</Text> */}
+      {/* List Latihan */}
       <FlatList
-        data={allExercises}
+        data={filteredExercises}
         keyExtractor={(item) => item.id}
         renderItem={renderExerciseItem}
       />
 
-      {/* Add Exercises Button */}
+      {/* Tombol Tambah Latihan */}
       {selectedExercises.length > 0 && (
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('LatihanTambah')}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('LatihanTambah', { exercises: selectedExercises })}
+        >
           <Text style={styles.addButtonText}>
             Add {selectedExercises.length} {selectedExercises.length === 1 ? 'exercise' : 'exercises'}
           </Text>
@@ -115,33 +108,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
   },
-  filterContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  filterButton: {
-    backgroundColor: '#333',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  filterText: {
-    color: '#FFF',
-    fontSize: 14,
-  },
-  sectionTitle: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
   exerciseItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+    paddingLeft: 8, // Tambahkan padding agar garis tidak menyentuh konten
+  },
+  selectedExerciseItem: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#4DA6FF', // Warna biru untuk garis
   },
   exerciseImage: {
     width: 50,
@@ -162,6 +139,9 @@ const styles = StyleSheet.create({
   },
   iconStyle: {
     marginRight: 8,
+  },
+  detailButton: {
+    marginLeft: 8,
   },
   addButton: {
     backgroundColor: '#4DA6FF',

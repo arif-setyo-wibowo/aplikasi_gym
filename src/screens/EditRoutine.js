@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, A
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
-const LatihanTambah = () => {
+const EditRoutine = () => {
   const navigation = useNavigation();
   const [exercises, setExercises] = useState([
     { id: '1', name: 'Bench Press (Dumbbell)', image: 'https://via.placeholder.com/50', sets: [{ id: 1, kg: '', reps: '' }] },
@@ -105,6 +105,11 @@ const LatihanTambah = () => {
 
   return (
     <View style={styles.container}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search exercise"
+        placeholderTextColor="#888"
+      />
       <FlatList
         data={exercises}
         keyExtractor={(item) => item.id}
@@ -112,7 +117,7 @@ const LatihanTambah = () => {
         contentContainerStyle={styles.exerciseList}
       />
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.addExerciseButton}  onPress={() => {addExercise; navigation.navigate('Latihan');}}>
+        <TouchableOpacity style={styles.addExerciseButton} onPress={() => {addExercise; navigation.navigate('Latihan');}}>
           <Text style={styles.addExerciseText}>+ Add exercise</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
@@ -128,6 +133,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
     padding: 16,
+  }, 
+  searchInput: {
+    backgroundColor: '#1A1A1A',
+    color: '#FFF',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 16,
   },
   exerciseList: {
     paddingBottom: 16,
@@ -240,4 +253,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LatihanTambah;
+export default EditRoutine;

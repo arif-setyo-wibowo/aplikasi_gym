@@ -13,6 +13,8 @@ import testScreen from './src/screens/EmailScreen';
 import PasswordScreen from './src/screens/Password';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import DetailRoutineScreen from './src/screens/DetailRoutine';
+import EditRoutineScreen from './src/screens/EditRoutine';
 import { useNavigation } from '@react-navigation/native'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -137,6 +139,27 @@ function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
         }}
       />
 
+      <Stack.Screen 
+        name="DetailRoutine" 
+        component={DetailRoutineScreen} 
+        options={{ title: 'Detail Routine', headerShown: true }} 
+        listeners={{
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true), 
+        }}
+      />
+
+
+      <Stack.Screen 
+        name="EditRoutine" 
+        component={EditRoutineScreen} 
+        options={{ title: 'Edit Routine', headerShown: true }} 
+        listeners={{
+          focus: () => setShowBottomBar(false), 
+          blur: () => setShowBottomBar(true), 
+        }}
+      />
+
     </Stack.Navigator>
   );
 }
@@ -249,9 +272,6 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
-
-
 
 const styles = StyleSheet.create({
   bottomBar: {

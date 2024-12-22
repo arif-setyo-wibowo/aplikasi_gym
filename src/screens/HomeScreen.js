@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  TextInput,
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -29,25 +28,29 @@ export default function HomeScreen() {
     setModalVisible(false);
   };
 
-  const updateRoutine = (newName) => {
-    if (selectedRoutine) {
-      setRoutines((prev) =>
-        prev.map((routine) =>
-          routine.id === selectedRoutine.id
-            ? { ...routine, name: newName }
-            : routine
-        )
-      );
-      closeModal();
-    }
-  };
-
   const deleteRoutine = () => {
     if (selectedRoutine) {
-      setRoutines((prev) =>
-        prev.filter((routine) => routine.id !== selectedRoutine.id)
+      Alert.alert(
+        'Konfirmasi Hapus',
+        `Apakah kamu yakin untuk menghapus "${selectedRoutine.name}"?`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Hapus',
+            style: 'destructive',
+            onPress: () => {
+              setRoutines((prev) =>
+                prev.filter((routine) => routine.id !== selectedRoutine.id)
+              );
+              closeModal();
+            },
+          },
+        ],
+        { cancelable: true }
       );
-      closeModal();
     }
   };
 
@@ -71,19 +74,24 @@ export default function HomeScreen() {
       <View style={styles.myRoutines}>
         <Text style={styles.sectionTitle}>My Routines</Text>
         {routines.map((routine) => (
-          <View key={routine.id} style={styles.routineItem}>
-            <View style={styles.routineTextContainer}>
-              <Text style={styles.routineName}>{routine.name}</Text>
-              <Text style={styles.routineDetails}>{routine.details}</Text>
+          <TouchableOpacity 
+          onPress={() => navigation.navigate('DetailRoutine')}>
+            <View key={routine.id} style={styles.routineItem}>
+              
+                <View style={styles.routineTextContainer}>
+                  <Text style={styles.routineName}>{routine.name}</Text>
+                  <Text style={styles.routineDetails}>{routine.details}</Text>
+                </View>
+              <TouchableOpacity
+                style={styles.moreButton}
+                onPress={() => openModal(routine)}
+              >
+                <Icon name="ellipsis-horizontal" size={20} color="#fff" />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.moreButton}
-              onPress={() => openModal(routine)}
-            >
-              <Icon name="ellipsis-horizontal" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         ))}
+        
       </View>
 
       {/* Modal */}
@@ -95,28 +103,27 @@ export default function HomeScreen() {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {/* Tombol Close Modal */}
             <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-              <Icon name="close" size={20} color="#fff" />
+              <Icon name="close" size={24} color="#fff" />
             </TouchableOpacity>
 
-            <Text style={styles.modalTitle}>Routine</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.detailButton}>
-                <Text style={styles.detailButtonText}>Detail Edit Routine</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.editButton}>
-                <Text style={styles.editButtonText}>Edit Routine</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteButton}>
-                <Text style={styles.deleteButtonText}>Delete Routine</Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.modalTitle}>{selectedRoutine?.name}</Text>
+
+            <TouchableOpacity style={styles.modalOption} onPress={() => {
+              closeModal(); 
+              navigation.navigate('EditRoutine');
+            }}>
+              <Icon name="pencil-outline" size={20} color="#fff" />
+              <Text style={styles.modalOptionText}>Edit Routine</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.modalOption, styles.deleteOption]} onPress={deleteRoutine}>
+              <Icon name="trash-outline" size={20} color="red" />
+              <Text style={[styles.modalOptionText, styles.deleteOptionText]}>Delete Routine</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
-
-
     </View>
   );
 }
@@ -182,15 +189,34 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#333',
-    width: '80%',
+    width: '90%',
     padding: 20,
     borderRadius: 10,
   },
   modalTitle: {
-    color: '#fff',
     fontSize: 18,
+    color: '#fff',
     fontWeight: 'bold',
-    marginBottom: 10,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  modalOptionText: {
+    marginLeft: 15,
+    color: '#fff',
+    fontSize: 16,
+  },
+  deleteOption: {
+    borderBottomWidth: 0,
+  },
+  deleteOptionText: {
+    color: 'red',
   },
   input: {
     backgroundColor: '#222',
