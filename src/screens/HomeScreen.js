@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,35 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const [routines, setRoutines] = useState([
-    { id: 1, name: 'Tes', details: 'Bench Press (Dumbbell), Bicep Curl (Dumbbell)' },
-  ]);
+  const [routines, setRoutines] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState(null);
+
+  useEffect(() => {
+    const fetchRoutines = async () => {
+      try {
+        const ip = await AsyncStorage.getItem('ip');
+        const userid = await AsyncStorage.getItem('id');
+        const response = await fetch(`http://${ip}:8080/routine`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'user_id': userid,
+          }
+        });
+        const result = await response.json();
+        setRoutines(result.data.routines);
+      } catch (error) {
+        console.error('Error fetching routines:', error);
+        Alert.alert('Error', 'Gagal mengambil data routines');
+      }
+    };
+    fetchRoutines();
+  }, []);
 
   const openModal = (routine) => {
     setSelectedRoutine(routine);
@@ -28,7 +49,7 @@ export default function HomeScreen() {
     setModalVisible(false);
   };
 
-  const deleteRoutine = () => {
+  const deleteRoutine = async () => {
     if (selectedRoutine) {
       Alert.alert(
         'Konfirmasi Hapus',
@@ -41,11 +62,30 @@ export default function HomeScreen() {
           {
             text: 'Hapus',
             style: 'destructive',
-            onPress: () => {
-              setRoutines((prev) =>
-                prev.filter((routine) => routine.id !== selectedRoutine.id)
-              );
-              closeModal();
+            onPress: async () => {
+              try {
+                const ip = await AsyncStorage.getItem('ip');                
+                const response = await fetch(`http://${ip}:8080/delete-routine`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'id': selectedRoutine.id, 
+                  },
+                });
+  
+                if (response.status === 200) {
+                  setRoutines((prev) =>
+                    prev.filter((routine) => routine.id !== selectedRoutine.id)
+                  );
+                  closeModal();
+                  Alert.alert('Sukses', 'Routine berhasil dihapus');
+                } else {
+                  Alert.alert('Gagal', 'Gagal menghapus routine');
+                }
+              } catch (error) {
+                console.error('Error deleting routine:', error);
+                Alert.alert('Error', 'Terjadi kesalahan saat menghapus routine');
+              }
             },
           },
         ],
@@ -53,7 +93,7 @@ export default function HomeScreen() {
       );
     }
   };
-
+  
   return (
     <View style={styles.container}>
       {/* Routines */}
@@ -75,13 +115,13 @@ export default function HomeScreen() {
         <Text style={styles.sectionTitle}>My Routines</Text>
         {routines.map((routine) => (
           <TouchableOpacity 
-          onPress={() => navigation.navigate('DetailRoutine')}>
-            <View key={routine.id} style={styles.routineItem}>
-              
-                <View style={styles.routineTextContainer}>
-                  <Text style={styles.routineName}>{routine.name}</Text>
-                  <Text style={styles.routineDetails}>{routine.details}</Text>
-                </View>
+            key={routine.id}
+            onPress={() => navigation.navigate('DetailRoutine', routine.id)}
+          >
+            <View style={styles.routineItem}>
+              <View style={styles.routineTextContainer}>
+                <Text style={styles.routineName}>{routine.name}</Text>
+              </View>
               <TouchableOpacity
                 style={styles.moreButton}
                 onPress={() => openModal(routine)}
@@ -91,7 +131,6 @@ export default function HomeScreen() {
             </View>
           </TouchableOpacity>
         ))}
-        
       </View>
 
       {/* Modal */}
@@ -111,7 +150,7 @@ export default function HomeScreen() {
 
             <TouchableOpacity style={styles.modalOption} onPress={() => {
               closeModal(); 
-              navigation.navigate('EditRoutine');
+              navigation.navigate('EditRoutine', { routineId: selectedRoutine.id, routineName: selectedRoutine.name });
             }}>
               <Icon name="pencil-outline" size={20} color="#fff" />
               <Text style={styles.modalOptionText}>Edit Routine</Text>
@@ -157,6 +196,7 @@ const styles = StyleSheet.create({
   },
   myRoutines: {
     marginTop: 20,
+    marginHorizontal: 5
   },
   routineItem: {
     flexDirection: 'row',

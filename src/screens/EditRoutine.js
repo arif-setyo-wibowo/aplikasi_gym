@@ -1,25 +1,76 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditRoutine = () => {
   const navigation = useNavigation();
-  const [exercises, setExercises] = useState([
-    { id: '1', name: 'Bench Press (Dumbbell)', image: 'https://via.placeholder.com/50', sets: [{ id: 1, kg: '', reps: '' }] },
-    { id: '2', name: 'Bicep Curl (Dumbbell)', image: 'https://via.placeholder.com/50', sets: [{ id: 1, kg: '', reps: '' }] },
-  ]);
+  const route = useRoute();
+  const { routineId, routineName } = route.params;
 
-  const addSet = (exerciseId) => {
-    setExercises((prevExercises) =>
-      prevExercises.map((exercise) => {
-        if (exercise.id === exerciseId) {
-          const newSet = { id: exercise.sets.length + 1, kg: '', reps: '' };
-          return { ...exercise, sets: [...exercise.sets, newSet] };
+  const [exercises, setExercises] = useState([]);
+
+  useEffect(() => {
+    if (routineId) {
+      fetchExercises(routineId);
+    }
+  }, [routineId]);
+
+  const fetchExercises = async (routineId) => {
+    try {
+      const ip = await AsyncStorage.getItem('ip');
+      const response = await fetch(`http://${ip}:8080/routine-exercise`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'routine_id': routineId,
+        },
+      });
+  
+      if (response.status === 200) {
+        const result = await response.json();  
+        if (result.data && Array.isArray(result.data)) {
+          const formattedExercises = result.data.map((item) => {
+            const setArray = item.set.split(','); 
+            const weightArray = item.weight.split(',');
+            const repetitionArray = item.repetition.split(',');
+  
+            const sets = setArray.map((setValue, index) => ({
+              id: parseInt(setValue, 10),
+              kg: weightArray[index] || '',
+              reps: repetitionArray[index] || '',
+            }));
+  
+            return {
+              id: item.exercise_id.toString(),
+              name: item.exercise?.name || 'Unknown Exercise',
+              image: item.exercise?.image || 'https://via.placeholder.com/50',
+              sets: sets,
+            };
+          });
+  
+          setExercises(formattedExercises);
+        } else {
+          Alert.alert('Error', 'Data latihan tidak ditemukan.');
         }
-        return exercise;
-      })
-    );
+      } else {
+        Alert.alert('Error', 'Gagal mengambil data latihan');
+      }
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
+      Alert.alert('Error', 'Terjadi kesalahan saat mengambil data');
+    }
+  };
+
+  const addExercise = () => {
+    const newExercise = {
+      id: Date.now().toString(),
+      name: 'New Exercise',
+      image: 'https://via.placeholder.com/50',
+      sets: [{ id: 1, kg: '', reps: '' }],
+    };
+    setExercises((prevExercises) => [...prevExercises, newExercise]);
   };
 
   const updateSet = (exerciseId, setId, field, value) => {
@@ -36,18 +87,16 @@ const EditRoutine = () => {
     );
   };
 
-  const deleteExercise = (exerciseId) => {
-    setExercises((prevExercises) => prevExercises.filter((exercise) => exercise.id !== exerciseId));
-  };
-
-  const addExercise = () => {
-    const newExercise = {
-      id: Date.now().toString(),
-      name: 'New Exercise',
-      image: 'https://via.placeholder.com/50',
-      sets: [{ id: 1, kg: '', reps: '' }],
-    };
-    setExercises((prevExercises) => [...prevExercises, newExercise]);
+  const addSet = (exerciseId) => {
+    setExercises((prevExercises) =>
+      prevExercises.map((exercise) => {
+        if (exercise.id === exerciseId) {
+          const newSet = { id: exercise.sets.length + 1, kg: '', reps: '' };
+          return { ...exercise, sets: [...exercise.sets, newSet] };
+        }
+        return exercise;
+      })
+    );
   };
 
   const saveRoutine = () => {
@@ -109,6 +158,7 @@ const EditRoutine = () => {
         style={styles.searchInput}
         placeholder="Search exercise"
         placeholderTextColor="#888"
+        value={routineName}
       />
       <FlatList
         data={exercises}
@@ -117,7 +167,7 @@ const EditRoutine = () => {
         contentContainerStyle={styles.exerciseList}
       />
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.addExerciseButton} onPress={() => {addExercise; navigation.navigate('Latihan');}}>
+        <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
           <Text style={styles.addExerciseText}>+ Add exercise</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
@@ -133,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
     padding: 16,
-  }, 
+  },
   searchInput: {
     backgroundColor: '#1A1A1A',
     color: '#FFF',
@@ -174,11 +224,6 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 14,
   },
-  deleteText: {
-    color: 'red',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   setRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -194,12 +239,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
-  },
-  setData: {
-    color: '#FFF',
-    fontSize: 14,
-    flex: 1,
-    textAlign: 'center',
   },
   setDataInput: {
     color: '#FFF',

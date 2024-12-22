@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
 const LatihanTambah = ({ route }) => {
-  const { selectedExercises: initialSelectedExercises } = route.params;
-  const [selectedExercises, setSelectedExercises] = useState(initialSelectedExercises);
+  const { selectedExercises: initialSelectedExercises } = route.params || {}; 
+  const [selectedExercises, setSelectedExercises] = useState(initialSelectedExercises || []);
   const [exercises, setExercises] = useState([]);
+  const [routineTitle, setRoutineTitle] = useState("");
+  const navigation = useNavigation();
 
   useEffect(() => {
-    if (selectedExercises && selectedExercises.length > 0) {
+    if (selectedExercises.length > 0) {
       const formattedExercises = selectedExercises.map((exercise) => ({
         ...exercise,
         sets: [{ id: 1, kg: '', reps: '' }],
@@ -50,14 +53,92 @@ const LatihanTambah = ({ route }) => {
     setSelectedExercises((prevSelectedExercises) => 
       prevSelectedExercises.filter((exercise) => exercise.id !== exerciseId)
     );
-
-    console.log(selectedExercises)
-  }; 
-
-  const saveRoutine = () => {
-    console.log('Routine saved:', exercises);
-    Alert.alert('Success', 'Routine disimpan!');
   };
+
+  const saveRoutine = async () => {
+    const updatedSelectedExercises = exercises.map((exercise) => {
+      const setsData = exercise.sets.map((set) => set.id);
+      const kgData = exercise.sets.map((set) => set.kg);
+      const repsData = exercise.sets.map((set) => set.reps);
+  
+      return {
+        ...exercise,
+        sets: setsData.join(','),
+        kg: kgData.join(','),
+        reps: repsData.join(','),
+        setsCount: exercise.sets.length,
+      };
+    });
+  
+    setSelectedExercises(updatedSelectedExercises);
+  
+    try {
+      const ip = await AsyncStorage.getItem('ip');
+      const userid = await AsyncStorage.getItem('id');
+      const response = await fetch(`http://${ip}:8080/add-routine`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'user_id': userid,
+        },
+        body: JSON.stringify({
+          name: routineTitle,
+        }),
+      });
+  
+      if (response.ok) {
+        const routineResponse = await response.json();
+        const routineId = routineResponse.data;
+  
+        await saveRoutineExercises(updatedSelectedExercises, routineId);
+  
+        Alert.alert('Success', 'Routine and exercises saved!', [
+      {
+            text: 'OK',
+            onPress: () => {
+              navigation.navigate('HomeScreen'); 
+            },
+          },
+        ]);
+      } else {
+        throw new Error('Failed to save routine');
+      }
+    } catch (error) {
+      console.error('Error saving routine:', error);
+      Alert.alert('Error', 'Failed to save routine. Please try again.');
+    }
+  };
+  
+  const saveRoutineExercises = async (exercises, routineId) => {
+    try {
+      const ip = await AsyncStorage.getItem('ip');
+      const exerciseRequests = exercises.map((exercise) => {
+        return fetch(`http://${ip}:8080/add-routine-exercise`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'routine_id': routineId,
+            'exercise_id': exercise.id
+          },
+          body: JSON.stringify({
+            set: exercise.sets,
+            repetition: exercise.reps,
+            weight: exercise.kg, 
+            note: exercise.note || '',
+          }),
+        });
+      });
+  
+      await Promise.all(exerciseRequests);
+  
+      console.log('Exercises saved successfully');
+    } catch (error) {
+      console.error('Error saving exercises:', error);
+      Alert.alert('Error', 'Failed to save exercises. Please try again.');
+    }
+  };
+  
+  
 
   const renderExerciseItem = ({ item }) => (
     <View style={styles.exerciseContainer}>
@@ -77,11 +158,11 @@ const LatihanTambah = ({ route }) => {
       </View>
       {item.sets.map((set) => (
         <View key={set.id} style={styles.setDataRow}>
-           <TextInput
-                style={[styles.setDataInput, { textAlign: 'center', color: '#fff' }]}
-                value={String(set.id)} 
-                editable={false} 
-              />
+          <TextInput
+            style={[styles.setDataInput, { textAlign: 'center', color: '#fff' }]}
+            value={String(set.id)} 
+            editable={false} 
+          />
           <TextInput
             style={styles.setDataInput}
             keyboardType="numeric"
@@ -112,10 +193,12 @@ const LatihanTambah = ({ route }) => {
         style={styles.routineTitle}
         placeholder="Routine Title"
         placeholderTextColor="#888"
+        value={routineTitle}
+        onChangeText={(text) => setRoutineTitle(text)}
       />
       <FlatList
         data={exercises}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={renderExerciseItem}
         contentContainerStyle={styles.exerciseList}
       />
