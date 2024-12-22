@@ -17,8 +17,9 @@ export default function RegisterScreen() {
     }
     
     try {
+      const ip = await AsyncStorage.getItem('ip');
       console.log('Making request...');
-      const response = await fetch('http://192.168.1.2:8080/register', {
+      const response = await fetch(`http://${ip}:8080/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

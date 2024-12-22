@@ -16,8 +16,9 @@ export default function LoginScreen() {
     }
   
     try {
+      const ip = await AsyncStorage.getItem('ip');
       // Mengirim request POST ke endpoint login
-      const response = await fetch('http://192.168.1.2:8080/login', { 
+      const response = await fetch(`http://${ip}:8080/login`, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,6 +43,8 @@ export default function LoginScreen() {
         // Jika login berhasil
         Alert.alert('Berhasil', 'Login berhasil!');
         navigation.navigate('HomeScreen');
+
+        
       } else {
         // Jika ada kesalahan dalam login
         Alert.alert('Error', data.rcMessage || 'Username atau password salah.');

@@ -12,6 +12,7 @@ export default function AccountSettings() {
     try {
       // Ambil user ID dari AsyncStorage
       const userid = await AsyncStorage.getItem('id') // Ambil ID pengguna dari AsyncStorage
+      const ip = await AsyncStorage.getItem('ip');
       //console.log(userid);
       
       if (!userid) {
@@ -19,7 +20,7 @@ export default function AccountSettings() {
         return;
       }
       // Kirim request logout ke server menggunakan fetch
-      const response = await fetch('http://192.168.1.2:8080/logout', {
+      const response = await fetch(`http://${ip}:8080/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,6 +35,7 @@ export default function AccountSettings() {
       if (response.ok) {
         // Menghapus user ID dan token dari AsyncStorage setelah logout
         await AsyncStorage.removeItem('Id');
+        await AsyncStorage.removeItem('token');
 
         // Arahkan ke halaman login setelah logout berhasil
         navigation.navigate('LoginScreen');

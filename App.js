@@ -199,15 +199,30 @@ export default function App() {
   const [showBottomBar, setShowBottomBar] = useState(true); 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  
+  useEffect(() => {
+    const initializeIP = async () => {
+      try {
+        const ip = await AsyncStorage.getItem('ip');
+        if (!ip) {
+          await AsyncStorage.setItem('ip', '192.168.1.11'); // Ganti dengan IP Anda
+          console.log('IP default disimpan ke AsyncStorage.');
+        }
+      } catch (error) {
+        console.error('Gagal menyimpan IP ke AsyncStorage:', error);
+      }
+    };
+
+    initializeIP();
+  }, []);
 
   useEffect(() => {
     // Fungsi untuk memeriksa status login dan token
     const checkLoginStatus = async () => {
       try {
         const token = await AsyncStorage.getItem('token'); // Mengambil token dari AsyncStorage
+        const ip = await AsyncStorage.getItem('ip'); // Mengambil IP dari AsyncStorage
         if (token) {
-          const response = await fetch('http://192.168.1.2:8080/check_session', {
+          const response = await fetch(`http://${ip}:8080/check_session`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -244,6 +259,8 @@ export default function App() {
     await AsyncStorage.removeItem('token');
     setIsLoggedIn(false);
   };
+
+
   return (
     <NavigationContainer>
       <MyStack 
