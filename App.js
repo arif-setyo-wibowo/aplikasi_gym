@@ -6,13 +6,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from './src/screens/HomeScreen';
 import DetailLatihanScreen from './src/screens/DetailLatihan';
 import AccountSettings from './src/screens/AccountSettings';
-import DetailScreen from './src/screens/Detail';
 import LatihanScreen from './src/screens/Latihan';
 import LatihanTambahScreen from './src/screens/LatihanTambah';
 import UsernameScreen from './src/screens/Username';
 import testScreen from './src/screens/EmailScreen';
 import PasswordScreen from './src/screens/Password';
-import DetailSScreen from './src/screens/DetailSettings';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import { useNavigation } from '@react-navigation/native'; 
@@ -38,17 +36,6 @@ function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
         }}
       />
       <Stack.Screen 
-        name="Detail" 
-        component={DetailScreen} 
-        options={{ 
-          title: 'Buat Workout', 
-        }}
-        listeners={{
-          focus: () => setShowBottomBar(false), 
-          blur: () => setShowBottomBar(true), 
-        }}
-      />
-      <Stack.Screen 
         name="Latihan" 
         component={LatihanScreen} 
         options={{ 
@@ -65,15 +52,6 @@ function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
         options={{ 
           title: 'Tambah Latihan', 
         }}
-        listeners={{
-          focus: () => setShowBottomBar(false), 
-          blur: () => setShowBottomBar(true)
-        }}
-      />
-      <Stack.Screen 
-        name="DetailSettings" 
-        component={DetailSScreen} 
-        options={{ title: 'Setelan Umum'}}
         listeners={{
           focus: () => setShowBottomBar(false), 
           blur: () => setShowBottomBar(true)
@@ -204,7 +182,7 @@ export default function App() {
       try {
         const ip = await AsyncStorage.getItem('ip');
         if (!ip) {
-          await AsyncStorage.setItem('ip', '192.168.1.11'); // Ganti dengan IP Anda
+          await AsyncStorage.setItem('ip', '192.168.0.100'); // Ganti dengan IP Anda
           console.log('IP default disimpan ke AsyncStorage.');
         }
       } catch (error) {
