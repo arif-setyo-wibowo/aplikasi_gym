@@ -71,7 +71,11 @@ const LatihanTambah = () => {
       </View>
       {item.sets.map((set) => (
         <View key={set.id} style={styles.setDataRow}>
-          <Text style={styles.setData}>{set.id}</Text>
+           <TextInput
+                style={[styles.setDataInput, { textAlign: 'center', color: '#fff' }]}
+                value={String(set.id)} 
+                editable={false} 
+              />
           <TextInput
             style={styles.setDataInput}
             keyboardType="numeric"
