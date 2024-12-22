@@ -1,22 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
 const DetailLatihan = () => {
-  const exercise = {
-    name: 'Bench Press (Dumbbell)',
-    image: 'https://via.placeholder.com/300',
-    primaryMuscle: 'Chest',
-    secondaryMuscles: ['Triceps', 'Shoulders'],
-    instructions: [
-      'Grab a pair of dumbbells, sit on a flat gym bench, and place both weights on top of your thighs.',
-      'Bring your shoulders back, engage your abs, take a breath, and flex your arms.',
-      'Kick both dumbbells up with your thighs as you lie back.',
-      'With your arms straight and dumbbells over your chest, dig your shoulder blades into the bench and place your feet flat on the floor.',
-      'Take another breath and lower both dumbbells to your sides. Keep your elbows somewhat tucked.',
-      'Lower the weights until your elbows are at torso level.',
-      'Press both dumbbells to the starting position, bringing them together as you exhale.',
-    ],
-  };
+  // Ambil parameter dari route
+  const route = useRoute();
+  const { exercise } = route.params;
 
   return (
     <ScrollView style={styles.container}>
@@ -29,24 +18,21 @@ const DetailLatihan = () => {
       {/* Primary dan Secondary */}
       <View style={styles.muscleContainer}>
         <Text style={styles.muscleText}>
-          <Text style={styles.label}>Primary: </Text>
-          {exercise.primaryMuscle}
+          <Text style={styles.label}>Equipment: </Text>
+          {exercise.equipment}
         </Text>
         <Text style={styles.muscleText}>
-          <Text style={styles.label}>Secondary: </Text>
-          {exercise.secondaryMuscles.join(', ')}
+          <Text style={styles.label}>Muscle: </Text>
+          {exercise.muscle}
         </Text>
       </View>
 
       {/* Langkah-langkah */}
-      <View style={styles.instructionsContainer}>
-        {exercise.instructions.map((step, index) => (
-          <View key={index} style={styles.stepContainer}>
-            <Text style={styles.stepNumber}>{index + 1}.</Text>
-            <Text style={styles.instruction}>{step}</Text>
-          </View>
-        ))}
-      </View>
+      {exercise.how && (
+        <View style={styles.instructionsContainer}>
+          <Text style={styles.instruction}>{exercise.how}</Text>
+        </View>
+      )}
     </ScrollView>
   );
 };

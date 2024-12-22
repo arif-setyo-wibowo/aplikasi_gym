@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
-const LatihanTambah = () => {
-  const navigation = useNavigation();
-  const [exercises, setExercises] = useState([
-    { id: '1', name: 'Bench Press (Dumbbell)', image: 'https://via.placeholder.com/50', sets: [{ id: 1, kg: '', reps: '' }] },
-    { id: '2', name: 'Bicep Curl (Dumbbell)', image: 'https://via.placeholder.com/50', sets: [{ id: 1, kg: '', reps: '' }] },
-  ]);
+const LatihanTambah = ({ route }) => {
+  const { selectedExercises: initialSelectedExercises } = route.params;
+  const [selectedExercises, setSelectedExercises] = useState(initialSelectedExercises);
+  const [exercises, setExercises] = useState([]);
+
+  useEffect(() => {
+    if (selectedExercises && selectedExercises.length > 0) {
+      const formattedExercises = selectedExercises.map((exercise) => ({
+        ...exercise,
+        sets: [{ id: 1, kg: '', reps: '' }],
+      }));
+      setExercises(formattedExercises);
+    }
+  }, [selectedExercises]);
 
   const addSet = (exerciseId) => {
     setExercises((prevExercises) =>
@@ -38,17 +46,13 @@ const LatihanTambah = () => {
 
   const deleteExercise = (exerciseId) => {
     setExercises((prevExercises) => prevExercises.filter((exercise) => exercise.id !== exerciseId));
-  };
+  
+    setSelectedExercises((prevSelectedExercises) => 
+      prevSelectedExercises.filter((exercise) => exercise.id !== exerciseId)
+    );
 
-  const addExercise = () => {
-    const newExercise = {
-      id: Date.now().toString(),
-      name: 'New Exercise',
-      image: 'https://via.placeholder.com/50',
-      sets: [{ id: 1, kg: '', reps: '' }],
-    };
-    setExercises((prevExercises) => [...prevExercises, newExercise]);
-  };
+    console.log(selectedExercises)
+  }; 
 
   const saveRoutine = () => {
     console.log('Routine saved:', exercises);
@@ -61,7 +65,6 @@ const LatihanTambah = () => {
         <Image source={{ uri: item.image }} style={styles.exerciseImage} />
         <View style={styles.exerciseInfo}>
           <Text style={styles.exerciseName}>{item.name}</Text>
-          <Text style={styles.exerciseNote}>Catatan</Text>
         </View>
         <TouchableOpacity onPress={() => deleteExercise(item.id)}>
           <Icon name="trash-outline" size={20} color="red" />
@@ -105,6 +108,11 @@ const LatihanTambah = () => {
 
   return (
     <View style={styles.container}>
+      <TextInput
+        style={styles.routineTitle}
+        placeholder="Routine Title"
+        placeholderTextColor="#888"
+      />
       <FlatList
         data={exercises}
         keyExtractor={(item) => item.id}
@@ -112,9 +120,6 @@ const LatihanTambah = () => {
         contentContainerStyle={styles.exerciseList}
       />
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.addExerciseButton}  onPress={() => {addExercise; navigation.navigate('Latihan');}}>
-          <Text style={styles.addExerciseText}>+ Add exercise</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
           <Text style={styles.saveText}>Save</Text>
         </TouchableOpacity>
@@ -128,6 +133,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
     padding: 16,
+  },
+  routineTitle: {
+    backgroundColor: '#1A1A1A',
+    color: '#FFF',
+    borderRadius: 8,
+    padding: 13,
+    fontSize: 16,
+    marginBottom: 16,
   },
   exerciseList: {
     paddingBottom: 16,

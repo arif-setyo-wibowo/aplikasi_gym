@@ -1,21 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LatihanScreen = () => {
   const navigation = useNavigation();
   const [selectedExercises, setSelectedExercises] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [allExercises, setAllExercises] = useState([]);
+  const [filteredExercises, setFilteredExercises] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const allExercises = [
-    { id: '3', name: '21s Bicep Curl', muscle: 'Biceps', image: 'https://via.placeholder.com/50' },
-    { id: '4', name: 'Ab Scissors', muscle: 'Abdominals', image: 'https://via.placeholder.com/50' },
-    { id: '5', name: 'Ab Wheel', muscle: 'Abdominals', image: 'https://via.placeholder.com/50' },
-    { id: '6', name: 'Dumbbell Bench Press', muscle: 'Chest', image: 'https://via.placeholder.com/50' },
-    { id: '7', name: 'Plank', muscle: 'Core', image: 'https://via.placeholder.com/50' },
-    { id: '8', name: 'Deadlift', muscle: 'Back', image: 'https://via.placeholder.com/50' },
-  ];
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const ip = await AsyncStorage.getItem('ip');
+        const response = await fetch(`http://${ip}:8080/exercise`);
+        const result = await response.json();
+
+        if (result.rc === "200" && result.data?.dataExer) {
+          setAllExercises(result.data.dataExer);
+          setFilteredExercises(result.data.dataExer);
+        } else {
+          console.error("Invalid response structure:", result);
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching exercises:', error);
+        setLoading(false);
+      }
+    };
+  
+    fetchExercises();
+  }, []);
+
+  useEffect(() => {
+    const filtered = allExercises.filter((exercise) =>
+      exercise.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      exercise.equipment.toLowerCase().includes(searchText.toLowerCase()) ||
+      exercise.muscle.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredExercises(filtered);
+  }, [searchText, allExercises]);
 
   const handleExerciseClick = (exercise) => {
     if (selectedExercises.some((e) => e.id === exercise.id)) {
@@ -23,11 +52,7 @@ const LatihanScreen = () => {
     } else {
       setSelectedExercises([...selectedExercises, exercise]);
     }
-  };
-
-  const filteredExercises = allExercises.filter((exercise) =>
-    exercise.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  };  
 
   const renderExerciseItem = ({ item }) => {
     const isSelected = selectedExercises.some((e) => e.id === item.id);
@@ -81,10 +106,7 @@ const LatihanScreen = () => {
 
       {/* Tombol Tambah Latihan */}
       {selectedExercises.length > 0 && (
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('LatihanTambah', { exercises: selectedExercises })}
-        >
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('LatihanTambah', { selectedExercises })}>
           <Text style={styles.addButtonText}>
             Add {selectedExercises.length} {selectedExercises.length === 1 ? 'exercise' : 'exercises'}
           </Text>
