@@ -59,7 +59,7 @@ export default function HomeScreen() {
         <View style={styles.routineButtons}>
           <TouchableOpacity
             style={styles.routineButton}
-            onPress={() => navigation.navigate('Detail')}
+            onPress={() => navigation.navigate('Latihan')}
           >
             <Icon name="document-outline" size={20} color="#fff" />
             <Text style={styles.buttonText}>New Routine</Text>
