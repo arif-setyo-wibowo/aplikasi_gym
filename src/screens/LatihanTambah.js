@@ -129,9 +129,6 @@ const LatihanTambah = ({ route }) => {
           }),
         });
       });
-
-      console.log(exercises)
-      console.log(selectedExercises)
   
       await Promise.all(exerciseRequests);
       console.log('Exercises saved successfully');
