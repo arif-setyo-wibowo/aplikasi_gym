@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet,StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -23,9 +23,9 @@ const Stack = createStackNavigator();
 
 function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
   return (
-    <Stack.Navigator initialRouteName={isLoggedIn ? "HomeScreen" : "LoginScreen"}
+    <Stack.Navigator initialRouteName={isLoggedIn ? "HomeScreen" : "HomeScreen"}
     screenOptions={{
-      headerStyle: { backgroundColor: '#000' },
+      headerStyle: { backgroundColor: '#1e1e1e' },
       headerTintColor: '#fff',
     }}>
       <Stack.Screen 
@@ -101,7 +101,7 @@ function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
         name="email" 
         component={testScreen} 
         options={{ 
-          title: 'Ubah Password'
+          title: 'Ubah Email'
         }}
         listeners={{
           focus: () => setShowBottomBar(false), 
@@ -206,7 +206,7 @@ export default function App() {
         await AsyncStorage.removeItem('ip');
         const ip = await AsyncStorage.getItem('ip');
         if (!ip) {
-          await AsyncStorage.setItem('ip', '192.168.0.100');
+          await AsyncStorage.setItem('ip', '192.168.1.11');
           console.log('IP default disimpan ke AsyncStorage.');
         }
       } catch (error) {
@@ -265,6 +265,7 @@ export default function App() {
 
   return (
     <NavigationContainer>
+      <StatusBar backgroundColor="#1E1E2C" barStyle="light-content" />
       <MyStack 
         setActiveTab={setActiveTab} 
         setShowBottomBar={setShowBottomBar} 

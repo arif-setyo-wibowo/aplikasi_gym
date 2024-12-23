@@ -88,7 +88,7 @@ const LatihanScreen = () => {
           onPress={() => navigation.navigate('detailLatihan', { exercise: item })}
           style={styles.detailButton}
         >
-          <Icon name="information-circle-outline" size={24} color="#4DA6FF" />
+          <Icon name="information-circle-outline" size={24} color="#f57c00" />
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   selectedExerciseItem: {
     borderLeftWidth: 4,
-    borderLeftColor: '#4DA6FF', 
+    borderLeftColor: '#f57c00', 
   },
   exerciseImage: {
     width: 50,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   addButton: {
-    backgroundColor: '#4DA6FF',
+    backgroundColor: '#f57c00',
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',

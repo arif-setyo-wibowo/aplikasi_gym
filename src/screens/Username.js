@@ -8,16 +8,16 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Username() {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Ambil username dari AsyncStorage saat aplikasi dimulai
   useEffect(() => {
     const fetchUsernameFromStorage = async () => {
       try {
-        const storedUsername = await AsyncStorage.getItem('username'); // Ambil username dari AsyncStorage
+        const storedUsername = await AsyncStorage.getItem('username');
         if (storedUsername) {
           setUsername(storedUsername);
         }
@@ -31,11 +31,10 @@ export default function Username() {
     fetchUsernameFromStorage();
   }, []);
 
-  // Fungsi untuk mengupdate username
   const handleUpdate = async () => {
     try {
-      const ip = await AsyncStorage.getItem('ip'); // Ambil IP dari AsyncStorage
-      const userid = await AsyncStorage.getItem('id'); // Ambil User ID dari AsyncStorage
+      const ip = await AsyncStorage.getItem('ip');
+      const userid = await AsyncStorage.getItem('id');
 
       const response = await fetch(`http://${ip}:8080/profile`, {
         method: 'POST',
@@ -49,7 +48,6 @@ export default function Username() {
       const data = await response.json();
 
       if (response.ok) {
-        // Simpan username yang diperbarui ke AsyncStorage
         await AsyncStorage.setItem('username', username);
         Alert.alert('Success', 'Username berhasil diperbarui.');
       } else {
@@ -70,14 +68,19 @@ export default function Username() {
 
   return (
     <View style={styles.container}>
-      {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          style={styles.input}
-          value={username}
-          onChangeText={setUsername}
-        />
+        <Text style={styles.label}>Full Name</Text>
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={20} color="#fff" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Your name"
+            placeholderTextColor="#888"
+          />
+          <Ionicons name="pencil-outline" size={20} color="#fff" style={styles.iconRight} />
+        </View>
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
@@ -89,38 +92,54 @@ export default function Username() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  content: {
-    flex: 1,
+    backgroundColor: '#1e1e1e', // Warna latar belakang sesuai tema
     padding: 20,
   },
-  label: {
-    color: 'white',
-    fontSize: 16,
-    marginBottom: 5,
+  content: {
+    flex: 0,
+    justifyContent: 'center',
   },
-  input: {
+  label: {
+    color: '#fff',
+    fontSize: 16,
+    marginBottom: 10,
+    fontWeight: 'bold',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#333',
-    color: 'white',
     borderRadius: 8,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     marginBottom: 20,
   },
+  icon: {
+    marginRight: 10,
+  },
+  iconRight: {
+    marginLeft: 10,
+  },
+  input: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 16,
+    padding: 5,
+  },
   button: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#f57c00',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
   loadingText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 16,
+    textAlign: 'center',
   },
 });

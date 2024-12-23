@@ -1,143 +1,161 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 export default function LoginScreen() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const localImage1 = require('../../assets/images/hitam.jpg');
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Harap isi semua kolom.');
+      Alert.alert('Error', 'Please fill in all fields.');
       return;
     }
-  
+
     try {
       const ip = await AsyncStorage.getItem('ip');
-      // Mengirim request POST ke endpoint login
-      const response = await fetch(`http://${ip}:8080/login`, { 
+      if (!ip) {
+        Alert.alert('Error', 'Server IP not found.');
+        return;
+      }
+
+      const response = await fetch(`http://${ip}:8080/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
+        body: JSON.stringify({ email, password }),
       });
-  
-      const data = await response.json();
-      //console.log(data); 
-  
-      if (response.ok) {
-        // Mengambil id dari respon
-        const userId = data.data.id;
-        const username = data.data.username;
-        const email = data.data.email;
-  
-        // Menyimpan id ke AsyncStorage
-        await AsyncStorage.setItem('id', userId.toString());
-        await AsyncStorage.setItem('username', username.toString());
-        await AsyncStorage.setItem('email', email.toString());
-        console.log('Stored ID:', username,email);
-       
-        // Jika login berhasil
-        Alert.alert('Berhasil', 'Login berhasil!');
-        navigation.navigate('HomeScreen');
 
-        
+      const data = await response.json();
+
+      if (response.ok) {
+        const { id, username, email } = data.data;
+        await AsyncStorage.setItem('id', id.toString());
+        await AsyncStorage.setItem('username', username);
+        await AsyncStorage.setItem('email', email);
+
+        Alert.alert('Success', 'Login successful!');
+        navigation.navigate('HomeScreen');
       } else {
-        // Jika ada kesalahan dalam login
-        Alert.alert('Error', data.rcMessage || 'Username atau password salah.');
+        Alert.alert('Error', data.rcMessage || 'Invalid email or password.');
       }
     } catch (error) {
-      // Jika ada kesalahan dalam permintaan
       console.error(error);
-      Alert.alert('Error', 'Terjadi kesalahan. Silakan coba lagi.');
+      Alert.alert('Error', 'An error occurred. Please try again.');
     }
   };
-  
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <ImageBackground
+     source={localImage1}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Sign In</Text>
+        <Text style={styles.subtitle}>Mulai bentuk tubuh agar kuat</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="gray"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email Address"
+            placeholderTextColor="#aaa"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="gray"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#aaa"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+        </View>
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')} style={styles.registerLink}>
-        <Text style={styles.registerLinkText}>Belum punya akun? Daftar</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')} style={styles.registerLink}>
+          <Text style={styles.registerLinkText}>Don’t have an account? <Text style={styles.linkText}>Sign Up.</Text></Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1e1e1e',
     paddingHorizontal: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Transparansi untuk overlay
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#aaa',
     marginBottom: 30,
   },
-  input: {
-    width: '100%',
-    height: 50,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#333',
     borderRadius: 10,
-    paddingHorizontal: 15,
     marginVertical: 10,
+    paddingHorizontal: 10,
+    width: '100%',
+    borderColor: '#f57c00',
+    borderWidth: 0,
+  },
+  input: {
+    flex: 1,
+    height: 50,
     color: '#fff',
     fontSize: 16,
   },
-  loginButton: {
+  button: {
+    backgroundColor: '#f57c00',
+    borderRadius: 10,
     width: '100%',
     height: 50,
-    backgroundColor: '#007bff',
-    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
+    marginTop: 20,
   },
-  loginButtonText: {
+  buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
   registerLink: {
-    marginTop: 10,
+    marginTop: 20,
   },
   registerLinkText: {
-    color: '#007bff',
-    fontSize: 16,
+    color: '#aaa',
+    fontSize: 14,
+  },
+  linkText: {
+    color: '#f57c00',
+    fontWeight: 'bold',
   },
 });

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Password() {
   const [password, setPassword] = useState('test123sdasd');
@@ -42,20 +43,24 @@ export default function Password() {
 
   return (
     <View style={styles.container}>
-      {/* Content */}
       <View style={styles.content}>
         <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={20} color="#fff" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Your name"
+            placeholderTextColor="#888"
+            secureTextEntry
+          />
+          <Ionicons name="pencil-outline" size={20} color="#fff" style={styles.iconRight} />
+        </View>
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
       </View>
-
     </View>
   );
 }
@@ -63,42 +68,54 @@ export default function Password() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  content: {
-    flex: 1,
+    backgroundColor: '#1e1e1e', // Warna latar belakang sesuai tema
     padding: 20,
   },
-  label: {
-    color: 'white',
-    fontSize: 16,
-    marginBottom: 5,
+  content: {
+    flex: 0,
+    justifyContent: 'center',
   },
-  input: {
+  label: {
+    color: '#fff',
+    fontSize: 16,
+    marginBottom: 10,
+    fontWeight: 'bold',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#333',
-    color: 'white',
     borderRadius: 8,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     paddingVertical: 10,
     marginBottom: 20,
   },
+  icon: {
+    marginRight: 10,
+  },
+  iconRight: {
+    marginLeft: 10,
+  },
+  input: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 16,
+    padding: 5,
+  },
   button: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#f57c00',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#000',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  navItem: {
-    alignItems: 'center',
-  },
-  navText: {
-    color: 'white',
-    fontSize: 12,
-    marginTop: 5,
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

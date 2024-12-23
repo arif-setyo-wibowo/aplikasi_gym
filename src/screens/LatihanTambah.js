@@ -213,25 +213,32 @@ const LatihanTambah = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#111214', // Warna latar belakang sesuai tema
     padding: 16,
   },
   routineTitle: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#1E1E1E',
     color: '#FFF',
     borderRadius: 8,
     padding: 13,
     fontSize: 16,
     marginBottom: 16,
+    borderColor: '#f57c00',
+    borderWidth: 0, // Menonjolkan input dengan border oranye
   },
   exerciseList: {
     paddingBottom: 16,
   },
   exerciseContainer: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 8,
+    backgroundColor: '#1E1E1E',
+    borderRadius: 10,
     marginBottom: 16,
     padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3, // Bayangan halus untuk elemen
   },
   exerciseHeader: {
     flexDirection: 'row',
@@ -252,10 +259,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  exerciseNote: {
-    color: '#888',
-    fontSize: 14,
-  },
   deleteText: {
     color: 'red',
     fontSize: 14,
@@ -265,9 +268,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
+    marginTop: 5,
+
   },
   setColumn: {
-    color: '#FFF',
+    color: '#AAA',
     fontSize: 14,
     flex: 1,
     textAlign: 'center',
@@ -277,55 +282,39 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8,
   },
-  setData: {
-    color: '#FFF',
-    fontSize: 14,
-    flex: 1,
-    textAlign: 'center',
-  },
   setDataInput: {
+    backgroundColor: '#1E1E1E',
     color: '#FFF',
-    fontSize: 14,
+    fontSize: 16,
     flex: 1,
     textAlign: 'center',
+    borderRadius: 8,
+    borderColor: '#444',
+    borderWidth: 0,
+    padding: 4,
   },
   addSetButton: {
     backgroundColor: '#333',
-    borderRadius: 8,
+    borderRadius: 10,
     paddingVertical: 8,
     alignItems: 'center',
+    marginTop: 8,
+    borderWidth: 0,
+    borderColor: '#f57c00', // Border oranye untuk menonjolkan tombol
   },
   addSetText: {
-    color: '#FFF',
+    color: '#f57c00',
     fontSize: 14,
     fontWeight: 'bold',
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginTop: 16,
   },
-  addExerciseButton: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    flex: 1,
-    marginRight: 8,
-    alignItems: 'center',
-  },
-  addExerciseText: {
-    color: '#4DA6FF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   saveButton: {
-    backgroundColor: '#4DA6FF',
-    borderRadius: 8,
+    backgroundColor: '#f57c00',
+    borderRadius: 10,
     paddingVertical: 16,
     paddingHorizontal: 16,
-    flex: 1,
     alignItems: 'center',
   },
   saveText: {
