@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image, Alert, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -196,12 +196,15 @@ const LatihanTambah = ({ route }) => {
         value={routineTitle}
         onChangeText={(text) => setRoutineTitle(text)}
       />
-      <FlatList
-        data={exercises}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderExerciseItem}
-        contentContainerStyle={styles.exerciseList}
-      />
+
+      <ScrollView>
+        <FlatList
+          data={exercises}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderExerciseItem}
+          contentContainerStyle={styles.exerciseList}
+        />
+      </ScrollView>
       <View style={styles.footer}>
         <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
           <Text style={styles.saveText}>Save</Text>

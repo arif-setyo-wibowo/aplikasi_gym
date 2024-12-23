@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert, TextInput, ScrollView  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -253,12 +253,16 @@ const EditRoutine = () => {
         value={name}
         onChangeText={(text) => setName(text)}
       />
-      <FlatList
-        data={exercises}
-        keyExtractor={(item) => item.id}
-        renderItem={renderExerciseItem}
-        contentContainerStyle={styles.exerciseList}
-      />
+      
+      <ScrollView>
+        <FlatList
+          data={exercises}
+          keyExtractor={(item) => item.id}
+          renderItem={renderExerciseItem}
+          contentContainerStyle={styles.exerciseList}
+        />
+      </ScrollView>
+      
       <View style={styles.footer}>
         {/* <TouchableOpacity style={styles.addExerciseButton} onPress={() => navigation.navigate('Latihan', {exercises: exercises, mode: 'add', routineId: routineId, routineName: routineName})}>
           <Text style={styles.addExerciseText}>+ Add exercise</Text>
