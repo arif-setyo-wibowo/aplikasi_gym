@@ -19,7 +19,7 @@ const LatihanTambah = ({ route }) => {
       }));
       setExercises(formattedExercises);
     }
-  }, [selectedExercises]);
+  }, []);
 
   const addSet = (exerciseId) => {
     setExercises((prevExercises) =>
@@ -46,8 +46,6 @@ const LatihanTambah = ({ route }) => {
       })
     );
   };
-
-  
 
   const saveRoutine = async () => {
     const updatedSelectedExercises = exercises.map((exercise) => {

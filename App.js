@@ -23,7 +23,7 @@ const Stack = createStackNavigator();
 
 function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
   return (
-    <Stack.Navigator initialRouteName={isLoggedIn ? "HomeScreen" : "HomeScreen"}
+    <Stack.Navigator initialRouteName={isLoggedIn ? "HomeScreen" : "LoginScreen"}
     screenOptions={{
       headerStyle: { backgroundColor: '#1e1e1e' },
       headerTintColor: '#fff',
@@ -206,7 +206,7 @@ export default function App() {
         await AsyncStorage.removeItem('ip');
         const ip = await AsyncStorage.getItem('ip');
         if (!ip) {
-          await AsyncStorage.setItem('ip', '192.168.1.11');
+          await AsyncStorage.setItem('ip', '192.168.0.112');
           console.log('IP default disimpan ke AsyncStorage.');
         }
       } catch (error) {
