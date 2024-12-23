@@ -70,7 +70,7 @@ const LatihanScreen = () => {
 
         {/* Teks */}
         <View style={styles.exerciseTextContainer}>
-          <Text style={styles.exerciseName}>{item.name}</Text>
+          <Text style={styles.exerciseName}>{item.name} ({item.equipment})</Text>
           <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
         </View>
 

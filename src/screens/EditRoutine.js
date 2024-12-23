@@ -7,9 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const EditRoutine = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { routineId, routineName } = route.params;
-
+  const {routineId, routineName} = route.params;
+  const [name, setName] = useState(routineName || '');
   const [exercises, setExercises] = useState([]);
+  const [deletedExercises, setDeletedExercises] = useState([]);
 
   useEffect(() => {
     if (routineId) {
@@ -29,10 +30,11 @@ const EditRoutine = () => {
       });
   
       if (response.status === 200) {
-        const result = await response.json();  
+        const result = await response.json();
+  
         if (result.data && Array.isArray(result.data)) {
           const formattedExercises = result.data.map((item) => {
-            const setArray = item.set.split(','); 
+            const setArray = item.set.split(',');
             const weightArray = item.weight.split(',');
             const repetitionArray = item.repetition.split(',');
   
@@ -44,8 +46,10 @@ const EditRoutine = () => {
   
             return {
               id: item.exercise_id.toString(),
-              name: item.exercise?.name || 'Unknown Exercise',
-              image: item.exercise?.image || 'https://via.placeholder.com/50',
+              id_routex: item.id,
+              name: item.exercise.name,
+              image: item.exercise.image,
+              equipment: item.exercise.equipment,
               sets: sets,
             };
           });
@@ -63,15 +67,15 @@ const EditRoutine = () => {
     }
   };
 
-  const addExercise = () => {
-    const newExercise = {
-      id: Date.now().toString(),
-      name: 'New Exercise',
-      image: 'https://via.placeholder.com/50',
-      sets: [{ id: 1, kg: '', reps: '' }],
-    };
-    setExercises((prevExercises) => [...prevExercises, newExercise]);
-  };
+  // const addExercise = () => {
+  //   const newExercise = {
+  //     id: Date.now().toString(),
+  //     name: 'New Exercise',
+  //     image: 'https://via.placeholder.com/50',
+  //     sets: [{ id: 1, kg: '', reps: '' }],
+  //   };
+  //   setExercises((prevExercises) => [...prevExercises, newExercise]);
+  // };
 
   const updateSet = (exerciseId, setId, field, value) => {
     setExercises((prevExercises) =>
@@ -99,20 +103,118 @@ const EditRoutine = () => {
     );
   };
 
-  const saveRoutine = () => {
-    console.log('Routine saved:', exercises);
-    Alert.alert('Success', 'Routine disimpan!');
+  const deleteExercise = (exerciseId, id_routex) => {
+    setDeletedExercises((prevDeletedExercises) => [...prevDeletedExercises, id_routex]);
+    setExercises((prevExercises) => prevExercises.filter((exercise) => exercise.id !== exerciseId));
+  };
+  
+  
+  
+  const saveRoutine = async () => {
+    const updatedSelectedExercises = exercises.map((exercise) => {
+      const setsData = exercise.sets.map((set) => set.id);
+      const kgData = exercise.sets.map((set) => set.kg);
+      const repsData = exercise.sets.map((set) => set.reps);
+  
+      return {
+        ...exercise,
+        sets: setsData.join(','),
+        kg: kgData.join(','),
+        reps: repsData.join(','),
+        setsCount: exercise.sets.length,
+      };
+    });
+
+    try {
+      const ip = await AsyncStorage.getItem('ip');
+      const response = await fetch(`http://${ip}:8080/edit-routine`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'id': routineId,
+        },
+        body: JSON.stringify({
+          name: name,
+        }),
+      });
+  
+      if (response.ok) {
+        const routineResponse = await response.json();
+        await saveRoutineExercises(updatedSelectedExercises);
+  
+        Alert.alert('Success', 'Routine and exercises saved!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.navigate('HomeScreen');
+            },
+          },
+        ]);
+      } else {
+        throw new Error('Failed to save routine');
+      }
+    } catch (error) {
+      console.error('Error saving routine:', error);
+      Alert.alert('Error', 'Failed to save routine. Please try again.');
+    }
   };
 
+  const saveRoutineExercises = async (exercises) => {
+    try {
+      const ip = await AsyncStorage.getItem('ip');
+      for (let exercise of exercises) {        
+        const response = await fetch(`http://${ip}:8080/edit-routine-exercise`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'id': exercise.id_routex
+          },
+          body: JSON.stringify({
+            set: exercise.sets,
+            repetition: exercise.reps,
+            weight: exercise.kg, 
+            note: exercise.note || '',
+          }),
+        });
+
+        if (response.ok) {
+          console.log(`Exercise ${exercise.id} saved successfully`);
+        } else {
+          throw new Error(`Failed to save exercise ${exercise.id}`);
+        }       
+      }
+
+      for (let deleteexer of deletedExercises){
+        const response = await fetch(`http://${ip}:8080/delete-routine-exercise`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'id': deleteexer
+          }
+        });
+
+        if (response.ok) {
+          console.log(`Exercise ${deleteexer} Delete successfully`);
+        } else {
+          throw new Error(`Failed to save exercise ${deleteexer}`);
+        }
+      }
+
+      console.log('All exercises saved successfully');
+    } catch (error) {
+      console.error('Error saving exercises:', error);
+      Alert.alert('Error', 'Failed to save exercises. Please try again.');
+    }
+  };
+  
   const renderExerciseItem = ({ item }) => (
     <View style={styles.exerciseContainer}>
       <View style={styles.exerciseHeader}>
         <Image source={{ uri: item.image }} style={styles.exerciseImage} />
         <View style={styles.exerciseInfo}>
-          <Text style={styles.exerciseName}>{item.name}</Text>
-          <Text style={styles.exerciseNote}>Catatan</Text>
+          <Text style={styles.exerciseName}>{item.name} ({item.equipment})</Text>
         </View>
-        <TouchableOpacity onPress={() => deleteExercise(item.id)}>
+        <TouchableOpacity onPress={() => deleteExercise(item.id, item.id_routex)}>
           <Icon name="trash-outline" size={20} color="red" />
         </TouchableOpacity>
       </View>
@@ -156,9 +258,10 @@ const EditRoutine = () => {
     <View style={styles.container}>
       <TextInput
         style={styles.searchInput}
-        placeholder="Search exercise"
+        placeholder="Edit routine name"
         placeholderTextColor="#888"
-        value={routineName}
+        value={name}
+        onChangeText={(text) => setName(text)}
       />
       <FlatList
         data={exercises}
@@ -167,9 +270,9 @@ const EditRoutine = () => {
         contentContainerStyle={styles.exerciseList}
       />
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
+        {/* <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
           <Text style={styles.addExerciseText}>+ Add exercise</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
           <Text style={styles.saveText}>Save</Text>
         </TouchableOpacity>

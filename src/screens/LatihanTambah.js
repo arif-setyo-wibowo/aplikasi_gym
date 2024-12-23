@@ -47,13 +47,7 @@ const LatihanTambah = ({ route }) => {
     );
   };
 
-  const deleteExercise = (exerciseId) => {
-    setExercises((prevExercises) => prevExercises.filter((exercise) => exercise.id !== exerciseId));
   
-    setSelectedExercises((prevSelectedExercises) => 
-      prevSelectedExercises.filter((exercise) => exercise.id !== exerciseId)
-    );
-  };
 
   const saveRoutine = async () => {
     const updatedSelectedExercises = exercises.map((exercise) => {
@@ -91,7 +85,6 @@ const LatihanTambah = ({ route }) => {
         const routineId = routineResponse.data;
   
         await saveRoutineExercises(updatedSelectedExercises, routineId);
-  
         Alert.alert('Success', 'Routine and exercises saved!', [
       {
             text: 'OK',
@@ -107,6 +100,14 @@ const LatihanTambah = ({ route }) => {
       console.error('Error saving routine:', error);
       Alert.alert('Error', 'Failed to save routine. Please try again.');
     }
+  };
+
+  const deleteExercise = (exerciseId) => {
+    setExercises((prevExercises) => prevExercises.filter((exercise) => exercise.id !== exerciseId));
+  
+    setSelectedExercises((prevSelectedExercises) => 
+      prevSelectedExercises.filter((exercise) => exercise.id !== exerciseId)
+    );
   };
   
   const saveRoutineExercises = async (exercises, routineId) => {
@@ -128,9 +129,11 @@ const LatihanTambah = ({ route }) => {
           }),
         });
       });
+
+      console.log(exercises)
+      console.log(selectedExercises)
   
       await Promise.all(exerciseRequests);
-  
       console.log('Exercises saved successfully');
     } catch (error) {
       console.error('Error saving exercises:', error);
@@ -145,7 +148,7 @@ const LatihanTambah = ({ route }) => {
       <View style={styles.exerciseHeader}>
         <Image source={{ uri: item.image }} style={styles.exerciseImage} />
         <View style={styles.exerciseInfo}>
-          <Text style={styles.exerciseName}>{item.name}</Text>
+          <Text style={styles.exerciseName}>{item.name} ({item.equipment})</Text>
         </View>
         <TouchableOpacity onPress={() => deleteExercise(item.id)}>
           <Icon name="trash-outline" size={20} color="red" />

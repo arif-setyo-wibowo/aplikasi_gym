@@ -116,7 +116,7 @@ export default function HomeScreen() {
         {routines.map((routine) => (
           <TouchableOpacity 
             key={routine.id}
-            onPress={() => navigation.navigate('DetailRoutine', routine.id)}
+            onPress={() => navigation.navigate('DetailRoutine', { routineId: routine.id, routineName: routine.name })}
           >
             <View style={styles.routineItem}>
               <View style={styles.routineTextContainer}>
