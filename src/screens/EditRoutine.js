@@ -254,14 +254,10 @@ const EditRoutine = () => {
         onChangeText={(text) => setName(text)}
       />
       
-      <ScrollView>
-        <FlatList
-          data={exercises}
-          keyExtractor={(item) => item.id}
-          renderItem={renderExerciseItem}
-          contentContainerStyle={styles.exerciseList}
-        />
+      <ScrollView contentContainerStyle={styles.exerciseList}>
+        {exercises.map((item) => renderExerciseItem({ item }))}
       </ScrollView>
+
       
       <View style={styles.footer}>
         {/* <TouchableOpacity style={styles.addExerciseButton} onPress={() => navigation.navigate('Latihan', {exercises: exercises, mode: 'add', routineId: routineId, routineName: routineName})}>

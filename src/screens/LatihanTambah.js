@@ -197,14 +197,10 @@ const LatihanTambah = ({ route }) => {
         onChangeText={(text) => setRoutineTitle(text)}
       />
 
-      <ScrollView>
-        <FlatList
-          data={exercises}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderExerciseItem}
-          contentContainerStyle={styles.exerciseList}
-        />
+      <ScrollView contentContainerStyle={styles.exerciseList}>
+        {exercises.map((item) => renderExerciseItem({ item }))}
       </ScrollView>
+
       <View style={styles.footer}>
         <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
           <Text style={styles.saveText}>Save</Text>
