@@ -206,7 +206,7 @@ export default function App() {
         await AsyncStorage.removeItem('ip');
         const ip = await AsyncStorage.getItem('ip');
         if (!ip) {
-          await AsyncStorage.setItem('ip', '192.168.0.112');
+          await AsyncStorage.setItem('ip', '192.168.1.11');
           console.log('IP default disimpan ke AsyncStorage.');
         }
       } catch (error) {

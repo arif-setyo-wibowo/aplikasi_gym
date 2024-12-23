@@ -94,21 +94,18 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Header Section */}
-      
       {/* Featured Section */}
       <ImageBackground source={localImage1} style={styles.imageVertikal}>
-            <View style={styles.overlayVertikal}>
-              <View style={styles.textContainerVertikal}>
-                <Text style={styles.imageTextVertikal}>Menjadi aktif, jaga</Text>
-                <Text style={styles.imageTextVertikal}>kebugaran</Text>
-                <Text style={styles.imageTextMiniVertikal}>150 menit per minggu</Text>
-              </View>
-            </View>
-          </ImageBackground>
-          
+        <View style={styles.overlayVertikal}>
+          <View style={styles.textContainerVertikal}>
+            <Text style={styles.imageTextVertikal}>Menjadi aktif, jaga</Text>
+            <Text style={styles.imageTextVertikal}>kebugaran</Text>
+            <Text style={styles.imageTextMiniVertikal}>150 menit per minggu</Text>
+          </View>
+        </View>
+      </ImageBackground>
 
-      {/* Routines Section */}
+      {/* Content Below Image */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Routines</Text>
         <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('Latihan')}>
@@ -167,6 +164,7 @@ export default function HomeScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -183,7 +181,7 @@ const styles = StyleSheet.create({
   },
   imageVertikal: {
     width: '100%',
-    height:'100%' ,
+    height: 250,
     borderRadius: 0,
     marginBottom: 10,
     overflow: 'hidden',
