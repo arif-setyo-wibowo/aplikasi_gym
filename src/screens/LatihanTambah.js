@@ -139,7 +139,7 @@ const LatihanTambah = ({ route }) => {
   
 
   const renderExerciseItem = ({ item }) => (
-    <View style={styles.exerciseContainer}>
+    <View key={item.id} style={styles.exerciseContainer}>
       <View style={styles.exerciseHeader}>
         <Image source={{ uri: item.image }} style={styles.exerciseImage} />
         <View style={styles.exerciseInfo}>
