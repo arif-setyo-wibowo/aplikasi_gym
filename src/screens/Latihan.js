@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LatihanScreen = () => {
@@ -10,41 +10,54 @@ const LatihanScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [allExercises, setAllExercises] = useState([]);
   const [filteredExercises, setFilteredExercises] = useState([]);
-  const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(true);
+  const route = useRoute();
+  const mode = route.params?.mode;
+  const exerciseUpdate = route.params?.exercises ?? [];
+  const routineId = route.params?.routineId ?? null;
+  const routineName = route.params?.routineName ?? null;
 
-  useEffect(() => {
+  useEffect(() => {  
     const fetchExercises = async () => {
       try {
         const ip = await AsyncStorage.getItem('ip');
         const response = await fetch(`http://${ip}:8080/exercise`);
         const result = await response.json();
-
+  
         if (result.rc === "200" && result.data?.dataExer) {
-          setAllExercises(result.data.dataExer);
-          setFilteredExercises(result.data.dataExer);
+          const exerciseUpdateIds = exerciseUpdate.map((exercise) => exercise.id);
+          const filteredData = result.data?.dataExer.filter((exercise) => {
+            return !exerciseUpdateIds.includes(exercise.id.toString()); 
+          });
+        
+          setAllExercises(filteredData);
+          setFilteredExercises(filteredData);
         } else {
           console.error("Invalid response structure:", result);
-        }
-        
-        setLoading(false);
+        }        
       } catch (error) {
         console.error('Error fetching exercises:', error);
+      } finally {
         setLoading(false);
       }
     };
-  
+
     fetchExercises();
-  }, []);
+  
+    navigation.setOptions({
+      title: mode ? 'Tambah Latihan' : 'Buat Latihan',
+    });
+  
+  }, [mode, navigation])
 
   useEffect(() => {
     const filtered = allExercises.filter((exercise) =>
-      exercise.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      exercise.equipment.toLowerCase().includes(searchText.toLowerCase()) ||
-      exercise.muscle.toLowerCase().includes(searchText.toLowerCase())
+      exercise.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exercise.equipment.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exercise.muscle.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredExercises(filtered);
-  }, [searchText, allExercises]);
+  }, [searchQuery, allExercises]);
 
   const handleExerciseClick = (exercise) => {
     if (selectedExercises.some((e) => e.id === exercise.id)) {
@@ -52,18 +65,14 @@ const LatihanScreen = () => {
     } else {
       setSelectedExercises([...selectedExercises, exercise]);
     }
-  };  
+  };
 
   const renderExerciseItem = ({ item }) => {
     const isSelected = selectedExercises.some((e) => e.id === item.id);
-
     return (
       <TouchableOpacity
         onPress={() => handleExerciseClick(item)}
-        style={[
-          styles.exerciseItem,
-          isSelected && styles.selectedExerciseItem, 
-        ]}
+        style={[styles.exerciseItem, isSelected && styles.selectedExerciseItem]}
       >
         {/* Gambar */}
         <Image source={{ uri: item.image }} style={styles.exerciseImage} />
@@ -73,7 +82,6 @@ const LatihanScreen = () => {
           <Text style={styles.exerciseName}>{item.name} ({item.equipment})</Text>
           <Text style={styles.exerciseMuscle}>{item.muscle}</Text>
         </View>
-
 
         {/* Ikon Detail */}
         <TouchableOpacity
@@ -106,7 +114,16 @@ const LatihanScreen = () => {
 
       {/* Tombol Tambah Latihan */}
       {selectedExercises.length > 0 && (
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('LatihanTambah', { selectedExercises })}>
+        <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => {
+          if (routineId === null || routineName === null) {
+            navigation.navigate('LatihanTambah', { selectedExercises });
+          } else {
+            navigation.navigate('EditRoutine', { routineId: routineId, routineName: routineName, selectedExercises });
+          }
+        }}
+      >
           <Text style={styles.addButtonText}>
             Add {selectedExercises.length} {selectedExercises.length === 1 ? 'exercise' : 'exercises'}
           </Text>
@@ -136,11 +153,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
-    paddingLeft: 8, // Tambahkan padding agar garis tidak menyentuh konten
+    paddingLeft: 8, 
   },
   selectedExerciseItem: {
     borderLeftWidth: 4,
-    borderLeftColor: '#4DA6FF', // Warna biru untuk garis
+    borderLeftColor: '#4DA6FF', 
   },
   exerciseImage: {
     width: 50,

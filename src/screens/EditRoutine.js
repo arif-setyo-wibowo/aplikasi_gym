@@ -67,16 +67,6 @@ const EditRoutine = () => {
     }
   };
 
-  // const addExercise = () => {
-  //   const newExercise = {
-  //     id: Date.now().toString(),
-  //     name: 'New Exercise',
-  //     image: 'https://via.placeholder.com/50',
-  //     sets: [{ id: 1, kg: '', reps: '' }],
-  //   };
-  //   setExercises((prevExercises) => [...prevExercises, newExercise]);
-  // };
-
   const updateSet = (exerciseId, setId, field, value) => {
     setExercises((prevExercises) =>
       prevExercises.map((exercise) => {
@@ -270,7 +260,7 @@ const EditRoutine = () => {
         contentContainerStyle={styles.exerciseList}
       />
       <View style={styles.footer}>
-        {/* <TouchableOpacity style={styles.addExerciseButton} onPress={addExercise}>
+        {/* <TouchableOpacity style={styles.addExerciseButton} onPress={() => navigation.navigate('Latihan', {exercises: exercises, mode: 'add', routineId: routineId, routineName: routineName})}>
           <Text style={styles.addExerciseText}>+ Add exercise</Text>
         </TouchableOpacity> */}
         <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
