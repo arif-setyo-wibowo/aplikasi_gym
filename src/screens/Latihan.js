@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8, 
   },
   selectedExerciseItem: {
+    borderRadius:6,
     borderLeftWidth: 4,
     borderLeftColor: '#f57c00', 
   },

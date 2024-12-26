@@ -31,7 +31,7 @@ function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
       <Stack.Screen 
         name="HomeScreen" 
         component={HomeScreen} 
-        options={{ title: 'Workout', headerLeft: () => null }}
+        options={{ headerShown: false, headerLeft: () => null }}
         listeners={{
           tabPress: () => setActiveTab('HomeScreen'),
           focus: () => setShowBottomBar(true)
@@ -64,7 +64,7 @@ function MyStack({ setActiveTab, setShowBottomBar, isLoggedIn  }) {
         name="AccountSettings" 
         component={AccountSettings} 
         options={{ 
-          title: 'Account Settings',
+          headerShown: false,
           headerLeft: () => null
         }}
         listeners={{
@@ -206,7 +206,7 @@ export default function App() {
         await AsyncStorage.removeItem('ip');
         const ip = await AsyncStorage.getItem('ip');
         if (!ip) {
-          await AsyncStorage.setItem('ip', '192.168.1.11');
+          await AsyncStorage.setItem('ip', '192.168.0.102');
           console.log('IP default disimpan ke AsyncStorage.');
         }
       } catch (error) {
